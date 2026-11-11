@@ -4,8 +4,11 @@
    FIGMA: Select the header in "Class of 2028 · Student directory".
           Notice 3 parts: logo + title, 3 navigation links, login button.
    ===================================================================== */
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+
+import { SavedService } from '../../services/saved.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -16,6 +19,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './header.css',
 })
 export class Header {
+  protected readonly auth = inject(AuthService);
+
   // STEP 2: Navigation data as an array. WHY: the template loops over it
   // with @for, so adding a link means adding one line here, not HTML.
   // `exact: true` means "active only on exactly '/'". Without it the home
@@ -29,4 +34,5 @@ export class Header {
   // STEP 3: A signal holds a value that, when it changes, updates the
   // screen automatically. Here: did the logo image fail to load?
   protected readonly logoFailed = signal(false);
+  protected readonly saved = inject(SavedService);
 }

@@ -1,33 +1,34 @@
-/* =====================================================================
-   FILE: src/app/components/student-card/student-card.ts
-   WHAT: One card showing a student's photo, name, faculty and quote.
-   WHY:  The students page loops over all students and shows one card
-         for each. The card only displays; it never loads data itself.
-   ===================================================================== */
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Student } from '../../models/student.model';
+import { SavedService } from '../../services/saved.service';
 
 @Component({
-  selector: 'app-student-card',
   imports: [RouterLink],
-  templateUrl: './student-card.html',
+  selector: 'app-student-card',
   styleUrl: './student-card.css',
+  templateUrl: './student-card.html',
 })
 export class StudentCard {
-  // The parent page gives us one student through this input.
   readonly student = input.required<Student>();
 
-  // Did the portrait fail to load?
+  private readonly saved = inject(SavedService);
+
+  protected readonly isSaved = computed(() => this.saved.isSaved(this.student().id));
+
   private readonly imageFailed = signal(false);
 
-  // The path actually shown: placeholder if the real image failed.
   protected readonly photoSrc = computed(() =>
     this.imageFailed() ? 'images/placeholder-portrait.svg' : this.student().photo,
   );
 
-  // Called by the template when the image cannot be loaded.
   protected onImageError(): void {
     this.imageFailed.set(true);
+  }
+
+  protected onToggleSaved(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.saved.toggle(this.student().id);
   }
 }
